@@ -4,8 +4,8 @@ from omni.ui import color as cl
 import omni.kit.viewport.utility
 
 from .model import ExtensionModel
-from .style import CollapsableControlFrameStyle, Common_Style, TreeViewFrameStyle, ImageAndTextButton
-
+from .style import Common_Style, ImageAndTextButton
+from .menu import OptionMenu
 label_height = 30
 label_width = 150
 Border_radius = 5
@@ -69,7 +69,7 @@ class ExtensionUI():
         self.category_item = ['COMPUTER', 'CHAIR', 'MACHINE']
         self.category_model = None
         self.selected_category = None
-        
+        self.menu = None
         self.drop_helper = None
         self._stage_update = None
         
@@ -114,7 +114,11 @@ class ExtensionUI():
                         ui.ComboBox(1, 'A Zone', 'B Zone', 'C Zone', 'D Zone')
                     ui.Spacer(width=MARGIN)
                     with ui.HStack():
-                        ui.Button(style=option_style, width=30, height=25, name='option', tooltip='Setting', alignment=ui.Alignment.RIGHT_CENTER)
+                        ui.Button(
+                            style=option_style, width=30, height=25, name='option', tooltip='Setting', 
+                            alignment=ui.Alignment.RIGHT_CENTER,
+                            mouse_pressed_fn=self.on_menu_pressed
+                        )
                         ui.Spacer(width=MARGIN)
 
                 with ui.HStack():
@@ -185,6 +189,25 @@ class ExtensionUI():
                     machine = machine+'.png'
                     drag_area(machine)
 
+    def build_setting_menu(self):
+        self.menu = ui.Menu("Option Menu")
+        with self.menu:
+            ui.MenuItem('Set Options', enabled=False)
+            ui.Separator()
+            with ui.HStack():
+                ui.CheckBox()
+                ui.MenuItem('Set Transform')
+
+            #ui.MenuItem("Set Transform Rotation", checkable=True)
+            #ui.MenuItem("Set Transform Position", checkable=True)
+        self.menu.show()
+        
+    def on_menu_pressed(self, x, y, btn, m):
+        if btn == 0 and not self.menu:
+            OptionMenu(self)
+        else:
+            self.menu = None
+
     def on_category_selection_changed(self, selected_items):
         for item in selected_items:
             cate = item.name_model.as_string
@@ -230,6 +253,7 @@ class ExtensionUI():
                 print(self.selected_category)
         
     def shutdown(self):
+        self.menu = None
         self.select_area = None 
         self.category_model = None
         self._furni_window = None

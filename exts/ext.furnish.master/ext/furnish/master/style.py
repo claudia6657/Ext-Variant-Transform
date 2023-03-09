@@ -8,7 +8,6 @@ Border_radius = 3
 Margin = 5
 
 Collapse_frame_Height = 80
-
 class Colors:
     Background = ui.color.shade(0xFF23211F, light=0xFF535354)
     Scrollbar = ui.color.shade(0xFF808080, light=0xFF9E9E9E)
@@ -16,13 +15,25 @@ class Colors:
     Text = ui.color.shade(0xFFA1A1A1, light=0xFFE0E0E0)
     DarkText = ui.color.shade(0xFF504F50, light=0xFFA1A1A1)
     ImageDisable = ui.color.shade(0xFF696969)
-    Image = ui.color.shade(0xFF9E9E9E)
     Hover = ui.color.shade(0xFFF4F9FE)
     ResetInvalid = ui.color.shade(0xFF505050)
     Reset = ui.color.shade(0xFFA07D4F)
     Line = ui.color.shade(0x338A8777)
     CLR_Label = 0xFFE2E2E2
     CLR_Disabled = 0xFFFFFFFF
+    Window = ui.color.shade(0xFF353535)
+    Hint = ui.color.shade(0xFF6A6A6A)
+    Warn = ui.color.shade(0xCC2222FF)
+    Image = ui.color.shade(0xFFA8A8A8)
+
+POPUP_MENU_STYLE = {
+    # "Window": {"background_color": 0xFFFF0000, "padding": 0, "margin": 0},
+    "Title.Background": {"background_color": Colors.Window},
+    "Title.Label": {"color": Colors.Selected, "font_size": 18},
+    "MenuButton": {"background_color": 0xFF4A4A4A, "stack_direction": ui.Direction.LEFT_TO_RIGHT, "spacing": 20},
+    "MenuButton.Label": {"color": 0xFFD4D4D4, "alignment": ui.Alignment.LEFT_CENTER},
+    "MenuSeparator": {"color": Colors.Window, "border_width": 4},
+}
 
 CollapsableControlFrameStyle = {
     "CollapsableFrame": {

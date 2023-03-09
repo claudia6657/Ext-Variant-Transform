@@ -115,8 +115,8 @@ class ExtensionModel():
         new_computer_trans = self.Get_VariantItem_transform(self.computerPath[-1])
         new_machine_trans = self.Get_VariantItem_transform(self.machinePath[-1])
         new_transform = [new_chair_trans, new_computer_trans, new_machine_trans]
-        for i in range(0, len(new_transform)-1):
-            if new_transform[i] != self.transform[0]:
+        for i in range(0, len(new_transform)):
+            if new_transform[i] != self.transform[i]:
                 for path in trans_item[i]:
                     stage = omni.usd.get_context().get_stage()
                     prim = stage.GetPrimAtPath(path)
