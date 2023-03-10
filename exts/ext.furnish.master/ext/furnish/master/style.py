@@ -27,12 +27,7 @@ class Colors:
     Image = ui.color.shade(0xFFA8A8A8)
 
 POPUP_MENU_STYLE = {
-    # "Window": {"background_color": 0xFFFF0000, "padding": 0, "margin": 0},
-    "Title.Background": {"background_color": Colors.Window},
-    "Title.Label": {"color": Colors.Selected, "font_size": 18},
-    "MenuButton": {"background_color": 0xFF4A4A4A, "stack_direction": ui.Direction.LEFT_TO_RIGHT, "spacing": 20},
-    "MenuButton.Label": {"color": 0xFFD4D4D4, "alignment": ui.Alignment.LEFT_CENTER},
-    "MenuSeparator": {"color": Colors.Window, "border_width": 4},
+    "Window": {"background_color": 0xFF232323, "padding": 0, "margin": 0},
 }
 
 CollapsableControlFrameStyle = {

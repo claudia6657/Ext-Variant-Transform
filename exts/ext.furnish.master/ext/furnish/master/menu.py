@@ -1,21 +1,30 @@
 import omni.ui as ui
+from .style import POPUP_MENU_STYLE
 
 class OptionMenu():
     
     def __init__(self, controller):
-        self.menu_window = ui.Window('menu', width=200, height=300)
-        menu_item = ['a', 'b']
-        self.build_menu(menu_item)
+        self.menu_window = ui.Window('menu', width=200, height=120, style=POPUP_MENU_STYLE)
+        self.menu_window.flags = ui.WINDOW_FLAGS_NO_COLLAPSE|ui.WINDOW_FLAGS_NO_RESIZE|ui.WINDOW_FLAGS_NO_TITLE_BAR
+        self.menu_item = ['Variant Items', 'Transform Translation', 'Transform Rotation']
+        self.menu_value = [True, True, True]
+        self.build_menu()
     
-    def build_menu(self, menuItem):
-        print('build menu?')
+    def build_menu(self):
         with self.menu_window.frame:
             with ui.VStack():
-                ui.Label('Set Options')
-                ui.Separator()
-                for i in menuItem:
-                    with ui.HStack():
-                        ui.CheckBox()
-                        ui.Label(i)
+                ui.Label('Set Selected Options', height=30)
+                ui.Separator(height=5)
+                for i in range(len(self.menu_item)):
+                    with ui.HStack(height=20, alignmemt=ui.Alignment.LEFT_TOP, style={"margin_hieght":2}):
+                        checkbox = ui.CheckBox(width=30)
+                        content = ui.Label(self.menu_item[i], alignmemt=ui.Alignment.LEFT_CENTER)
+                        checkbox.model.set_value(self.menu_value[i])
+                        checkbox.model.add_value_changed_fn(lambda check: self.check_menu_value(i, check.get_value_as_bool()))
+                        
+    
+    def check_menu_value(self, index, value):
+        self.menu_value[index] = value
+        print(self.menu_value)
                 
             

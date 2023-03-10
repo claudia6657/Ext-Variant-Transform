@@ -65,6 +65,8 @@ class ExtensionUI():
         self.model = ExtensionModel(self)
         self._furni_window = ui.Window("Variant Controller")
         self._furni_window.deferred_dock_in("Console")
+        self._menu_win = OptionMenu(self)
+        self._menu_win.menu_window.visible = False
         
         self.category_item = ['COMPUTER', 'CHAIR', 'MACHINE']
         self.category_model = None
@@ -188,25 +190,12 @@ class ExtensionUI():
                 for machine in self.machine_options:
                     machine = machine+'.png'
                     drag_area(machine)
-
-    def build_setting_menu(self):
-        self.menu = ui.Menu("Option Menu")
-        with self.menu:
-            ui.MenuItem('Set Options', enabled=False)
-            ui.Separator()
-            with ui.HStack():
-                ui.CheckBox()
-                ui.MenuItem('Set Transform')
-
-            #ui.MenuItem("Set Transform Rotation", checkable=True)
-            #ui.MenuItem("Set Transform Position", checkable=True)
-        self.menu.show()
         
     def on_menu_pressed(self, x, y, btn, m):
-        if btn == 0 and not self.menu:
-            OptionMenu(self)
+        if btn == 0 and not self._menu_win.menu_window.visible:
+            self._menu_win.menu_window.visible = True
         else:
-            self.menu = None
+            self._menu_win.menu_window.visible = False
 
     def on_category_selection_changed(self, selected_items):
         for item in selected_items:
@@ -254,6 +243,7 @@ class ExtensionUI():
         
     def shutdown(self):
         self.menu = None
+        self._menu_win = None
         self.select_area = None 
         self.category_model = None
         self._furni_window = None
