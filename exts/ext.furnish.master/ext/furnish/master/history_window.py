@@ -63,18 +63,8 @@ class HistoryDelegate(ui.AbstractItemDelegate):
     def build_widget(self, model, item, column_id, level, expanded):
         # TreeView Widget
         with ui.HStack(width=20):
-            if column_id == 1:
-                value_model = model.get_item_value_model(item, column_id)
-                ui.Label(value_model.as_string)
-            elif column_id == 2:
-                value_model = model.get_item_value_model(item, column_id)
-                ui.Label(value_model.as_string)
-            elif column_id == 3:
-                value_model = model.get_item_value_model(item, column_id)
-                ui.Label(value_model.as_string)
-            elif column_id == 4:
-                value_model = model.get_item_value_model(item, column_id)
-                ui.Label(value_model.as_string)
+            value_model = model.get_item_value_model(item, column_id)
+            ui.Label(value_model.as_string)
 
     def build_header(self, column_id):
         PATHS_COLUMNS = ["file", "comment", "user", "time", "size"]
@@ -177,14 +167,12 @@ class HistoryUI():
         layerpath = self.controller._layer.userBase
         layer = layerpath.split('/')
         option_style = {"image_url": f"D:\Exts\exts-design-preview\exts\ext.furnish.master\data\options.svg","color": 0xFF8A8777}
-        refresh_style = {"image_url": f"D:\Exts\exts-design-preview\exts\ext.furnish.master\data\Refresh.svg","color": 0xFF8A8777}
         with self._history_window.frame:
             with ui.VStack(width=ui.Percent(100), height=ui.Percent(100), style=Common_Style):                
                 ui.Spacer(height=5)
                 with ui.HStack(height=40):
                     ui.Label(self.user, name="TITLE")
                     ui.Button(style=option_style, width=35, height=30, name='option', tooltip='Setting')
-                    #ui.Button(style=refresh_style, width=35, height=30, tooltip='Refresh')
                 ui.Label(layer[-1], height=25, name="SUBTITLE")
                 ui.Spacer(height=5)
                 self._Hist_frame = self.build_history_list()
@@ -254,10 +242,12 @@ class HistoryUI():
         
         ''' update '''
         self._save_window.visible = False
-        self.historyStack.insert(0, self.command)
-        self.historyStack.insert(1, self.user)
-        self.historyStack.insert(2, str(datetime.now()))
-        self.historyStack.insert(3, '')
+        self.historyStack.insert(0, '')
+        self.historyStack.insert(1, self.command)
+        self.historyStack.insert(2, self.user)
+        self.historyStack.insert(3, str(datetime.now()))
+        self.historyStack.insert(4, '')
+        
         self.checkpointModel.on_changed(self.historyStack)
     
     def _on_clicked_cancel_btn(self):

@@ -15,16 +15,30 @@ class OptionMenu():
             with ui.VStack():
                 ui.Label('Set Selected Options', height=30)
                 ui.Separator(height=5)
-                for i in range(len(self.menu_item)):
-                    with ui.HStack(height=20, alignmemt=ui.Alignment.LEFT_TOP, style={"margin_hieght":2}):
-                        checkbox = ui.CheckBox(width=30)
-                        content = ui.Label(self.menu_item[i], alignmemt=ui.Alignment.LEFT_CENTER)
-                        checkbox.model.set_value(self.menu_value[i])
-                        checkbox.model.add_value_changed_fn(lambda check: self.check_menu_value(i, check.get_value_as_bool()))
-                        
+                content = []
+                with ui.HStack(height=20, alignmemt=ui.Alignment.LEFT_TOP, style={"margin_hieght":2}):
+                    checkbox = ui.CheckBox(width=30)
+                    label = ui.Label(self.menu_item[0], alignmemt=ui.Alignment.LEFT_CENTER, name=self.menu_item[0])
+                    content.insert(0, self.menu_item[0])
+                    checkbox.model.set_value(self.menu_value[0])
+                    checkbox.model.add_value_changed_fn(lambda check: self.check_menu_value(content[0], check.get_value_as_bool()))
+                with ui.HStack(height=20, alignmemt=ui.Alignment.LEFT_TOP, style={"margin_hieght":2}):
+                    checkbox = ui.CheckBox(width=30)
+                    label = ui.Label(self.menu_item[1], alignmemt=ui.Alignment.LEFT_CENTER, name=self.menu_item[1])
+                    content.insert(1, self.menu_item[1])
+                    checkbox.model.set_value(self.menu_value[1])
+                    checkbox.model.add_value_changed_fn(lambda check: self.check_menu_value(content[1], check.get_value_as_bool()))
+                with ui.HStack(height=20, alignmemt=ui.Alignment.LEFT_TOP, style={"margin_hieght":2}):
+                    checkbox = ui.CheckBox(width=30)
+                    label = ui.Label(self.menu_item[2], alignmemt=ui.Alignment.LEFT_CENTER, name=self.menu_item[2])
+                    content.insert(2, self.menu_item[2])
+                    checkbox.model.set_value(self.menu_value[2])
+                    checkbox.model.add_value_changed_fn(lambda check: self.check_menu_value(content[2], check.get_value_as_bool()))
     
-    def check_menu_value(self, index, value):
-        self.menu_value[index] = value
+    def check_menu_value(self, content, value):
+        print(content, value)
+        for i in range(len(self.menu_item)):
+            if content == self.menu_item[i]:
+                self.menu_value[i] = value 
         print(self.menu_value)
-                
-            
+        

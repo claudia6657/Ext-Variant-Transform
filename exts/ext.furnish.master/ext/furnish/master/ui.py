@@ -212,7 +212,8 @@ class ExtensionUI():
         self.model.allchair_variants_changed(self.chair)
         self.model.allcomputer_variants_changed(self.monitor)
         self.model.allmachine_variants_changed(self.machine)
-        self.model.all_transform_changed()
+        if self._menu_win.menu_value[1]:
+            self.model.all_transform_changed()
 
     def _on_mouse_double_clicked(self, btn, item):
         if btn == 0:
