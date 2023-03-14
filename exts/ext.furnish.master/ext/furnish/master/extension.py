@@ -50,7 +50,41 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
                     nm.NotificationButtonInfo("CANCEL", on_complete=cancel),
                 ]
             )
-            
+    
+    def _on_kit_selection_changed(self):
+        usd_context = omni.usd.get_context()
+        stage = usd_context.get_stage()
+        prim_paths = usd_context.get_selection().get_selected_prim_paths()
+        if 'Chair' in prim_paths[0]:
+            self._ui.selected_variant = []
+            for i in self._ui.model.chairVariantList:
+                path = str(i.GetPath()).split('/OmniVariants')[0]
+                print(path)
+                if path in prim_paths[0]:
+                    self._ui.selected_variant.append(i)
+                    print('yes')
+                    break
+        if 'Computer' in prim_paths[0]:
+            self._ui.selected_variant = []
+            for i in self._ui.model.computorVariantList:
+                path = str(i.GetPath()).split('/OmniVariants')[0]
+                print(path)
+                if path in prim_paths[0]:
+                    self._ui.selected_variant.append(i)
+                    print('yes')
+                    break
+        if 'machine' in prim_paths[0]:
+            for i in self._ui.model.machineVariantList:
+                path = str(i.GetPath())
+                
+                if path in prim_paths[0]:
+                    index = self._ui.model.machineVariantList.index(i)
+                    self._ui.selected_variant.append(i)
+                    self._ui.model.transform.insert(2,self._ui.model.Get_VariantItem_transform(self._ui.model.machinePath[index]))
+                    select = self._ui.model.machinePath[index].split('OmniVariants')[0]
+                    selection = usd_context.get_selection().set_selected_prim_paths([select], True)
+                    break
+        print(self._ui.selected_variant)
         
     def unsubscribe(self):
         if self._stage_event_sub:
@@ -59,6 +93,8 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
         
     def _on_stage_event(self, event: carb.events.IEvent):
         """Called on USD Context event"""
+        if event.type == int(omni.usd.StageEventType.SELECTION_CHANGED):
+            self._on_kit_selection_changed()
         if event.type == int(omni.usd.StageEventType.CLOSING):
             self.unsubscribe()
             self._ui.shutdown()
