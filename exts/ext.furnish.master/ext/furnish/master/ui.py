@@ -84,6 +84,7 @@ class ExtensionUI():
         self.machine = self.model.get_variant_selection('machine')
         
         self.selected_variant = []
+        self.selected_variantPath = []
         
         self.build_controller()
     
@@ -225,23 +226,21 @@ class ExtensionUI():
                 for i in self.chair_options:
                     if item.lower() in i.lower():
                         itemvariant = i
-                    if itemvariant:
-                        self.model.variant_changed(self.selected_variant[0], itemvariant)    
                         self.chair = itemvariant
             if self.selected_category.lower() == 'computer':
                 for i in self.monitor_options:
                     if item.lower() in i.lower():
-                        itemvariant = i
-                    if itemvariant:
-                        self.model.variant_changed(self.selected_variant[0], itemvariant)    
+                        itemvariant = i    
                         self.monitor = itemvariant
             if self.selected_category.lower() == 'machine':
                 for i in self.machine_options:
                     if item.lower() in i.lower():
                         itemvariant = i
-                    if itemvariant:
-                        self.model.variant_changed(self.selected_variant[-1], itemvariant)    
                         self.machine = itemvariant
+
+            if itemvariant:
+                for select in self.selected_variant:
+                    self.model.variant_changed(select, itemvariant)
             else:
                 print(self.selected_category)
         

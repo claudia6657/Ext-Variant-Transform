@@ -166,7 +166,7 @@ class HistoryUI():
     def build_history(self) -> None:
         layerpath = self.controller._layer.userBase
         layer = layerpath.split('/')
-        option_style = {"image_url": f"D:\Exts\exts-design-preview\exts\ext.furnish.master\data\options.svg","color": 0xFF8A8777}
+        option_style = {"image_url": f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data\options.svg","color": 0xFF8A8777}
         with self._history_window.frame:
             with ui.VStack(width=ui.Percent(100), height=ui.Percent(100), style=Common_Style):                
                 ui.Spacer(height=5)

@@ -52,38 +52,51 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
             )
     
     def _on_kit_selection_changed(self):
+        # Execute if Selection changed
         usd_context = omni.usd.get_context()
-        stage = usd_context.get_stage()
         prim_paths = usd_context.get_selection().get_selected_prim_paths()
-        if 'Chair' in prim_paths[0]:
-            self._ui.selected_variant = []
-            for i in self._ui.model.chairVariantList:
-                path = str(i.GetPath()).split('/OmniVariants')[0]
-                print(path)
-                if path in prim_paths[0]:
-                    self._ui.selected_variant.append(i)
-                    print('yes')
-                    break
-        if 'Computer' in prim_paths[0]:
-            self._ui.selected_variant = []
-            for i in self._ui.model.computorVariantList:
-                path = str(i.GetPath()).split('/OmniVariants')[0]
-                print(path)
-                if path in prim_paths[0]:
-                    self._ui.selected_variant.append(i)
-                    print('yes')
-                    break
-        if 'machine' in prim_paths[0]:
-            for i in self._ui.model.machineVariantList:
-                path = str(i.GetPath())
+        category = None
+        multiSelect = False
+        
+        def recount(variantList, pathList,selected):
+            for i in variantList:
+                    path = str(i.GetPath())
+                    
+                    if path in selected:
+                        index = variantList.index(i)
+                        self._ui.selected_variant.append(i)
+                        self._ui.model.transform.insert(2,self._ui.model.Get_VariantItem_transform(pathList[index]))
+                        select = pathList[index].split('/OmniVariants')[0]
+                        self._ui.selected_variantPath.append(select)
+                        selection = usd_context.get_selection().set_selected_prim_paths(self._ui.selected_variantPath, True)
+                        break
+        
+        print(prim_paths)
+        for selected in prim_paths:
+            if selected in self._ui.selected_variantPath:
+                multiSelect = True
                 
-                if path in prim_paths[0]:
-                    index = self._ui.model.machineVariantList.index(i)
-                    self._ui.selected_variant.append(i)
-                    self._ui.model.transform.insert(2,self._ui.model.Get_VariantItem_transform(self._ui.model.machinePath[index]))
-                    select = self._ui.model.machinePath[index].split('OmniVariants')[0]
-                    selection = usd_context.get_selection().set_selected_prim_paths([select], True)
-                    break
+            if 'Chair' in selected:
+                if category != 'Chair' and not multiSelect:
+                    self._ui.selected_variant = []
+                    self._ui.selected_variantPath = []
+                category = 'Chair'
+                recount(self._ui.model.chairVariantList, self._ui.model.chairPath, selected)
+
+            if 'Computer' in selected:
+                if category != 'Computer' and not multiSelect:
+                    self._ui.selected_variant = []
+                    self._ui.selected_variantPath = []
+                category = 'Computer'
+                recount(self._ui.model.computorVariantList, self._ui.model.computerPath, selected)
+                
+            if 'Machine' in selected:
+                if category != 'Machine' and not multiSelect:
+                    self._ui.selected_variant = []
+                    self._ui.selected_variantPath = []
+                category = 'Machine'
+                recount(self._ui.model.machineVariantList, self._ui.model.machinePath, selected)
+
         print(self._ui.selected_variant)
         
     def unsubscribe(self):

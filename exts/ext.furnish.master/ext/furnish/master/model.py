@@ -81,21 +81,11 @@ class ExtensionModel():
     # Variants Command
     def variant_changed(self, variant_item, variant_name):
         if variant_item == None:
-            prim = None
             return 0
-        elif variant_item == 'chair':
-            prim = self.chairVariantList[-1]
-        elif variant_item == 'monitor' or variant_item == 'computer':
-            prim = self.computorVariantList[-1]
-        elif variant_item == 'machine':
-            prim = self.machineVariantList[-1]
-        else:
-            prim = variant_item
         
-        if prim:
-            variant = prim.GetVariantSets().GetVariantSet("modelingVariant")
-            variant.SetVariantSelection(variant_name)
-            return 1
+        variant = variant_item.GetVariantSets().GetVariantSet("modelingVariant")
+        variant.SetVariantSelection(variant_name)
+        return 1
     
     # Set ALL
     def allchair_variants_changed(self, variant_name):
@@ -166,7 +156,7 @@ class ExtensionModel():
         if item and self.controller.selected_variant == []:
             ctx = omni.usd.get_context()
             selection = ctx.get_selection().set_selected_prim_paths([item], True)
-            self.controller.selected_variant[-1] = item
+            self.controller.selected_variant.append(item)
         
     def shutdown(self):
         self.chairVariantList = None

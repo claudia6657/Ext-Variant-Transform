@@ -28,6 +28,7 @@ class LayerController():
         self.default_layer_setting()
         
         if self.user == 'manager':
+            self.userBase = stage.GetRootLayer().identifier
             return True
         
         unmute = self.set_all_layers_unmute()
