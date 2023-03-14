@@ -83,6 +83,8 @@ class ExtensionUI():
         self.monitor = self.model.get_variant_selection('monitor')
         self.machine = self.model.get_variant_selection('machine')
         
+        self.selected_variant = []
+        
         self.build_controller()
     
     def build_controller(self) -> None:
@@ -209,9 +211,10 @@ class ExtensionUI():
         pass
         
     def on_simulation_clicked(self, X, Y, B, M):
-        self.model.allchair_variants_changed(self.chair)
-        self.model.allcomputer_variants_changed(self.monitor)
-        self.model.allmachine_variants_changed(self.machine)
+        if self._menu_win.menu_value[0]:
+            self.model.allchair_variants_changed(self.chair)
+            self.model.allcomputer_variants_changed(self.monitor)
+            self.model.allmachine_variants_changed(self.machine)
         if self._menu_win.menu_value[1]:
             self.model.all_transform_changed()
 
@@ -223,21 +226,21 @@ class ExtensionUI():
                     if item.lower() in i.lower():
                         itemvariant = i
                     if itemvariant:
-                        self.model.variant_changed(self.selected_category.lower(), itemvariant)    
+                        self.model.variant_changed(self.selected_variant[0], itemvariant)    
                         self.chair = itemvariant
             if self.selected_category.lower() == 'computer':
                 for i in self.monitor_options:
                     if item.lower() in i.lower():
                         itemvariant = i
                     if itemvariant:
-                        self.model.variant_changed(self.selected_category.lower(), itemvariant)    
+                        self.model.variant_changed(self.selected_variant[0], itemvariant)    
                         self.monitor = itemvariant
             if self.selected_category.lower() == 'machine':
                 for i in self.machine_options:
                     if item.lower() in i.lower():
                         itemvariant = i
                     if itemvariant:
-                        self.model.variant_changed(self.selected_category.lower(), itemvariant)    
+                        self.model.variant_changed(self.selected_variant[-1], itemvariant)    
                         self.machine = itemvariant
             else:
                 print(self.selected_category)
