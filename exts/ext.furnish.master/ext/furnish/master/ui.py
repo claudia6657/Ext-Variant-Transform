@@ -86,7 +86,7 @@ class ExtensionUI():
         self.build_controller()
     
     def build_controller(self) -> None:
-        option_style = {"image_url": f"D:\Exts\exts-design-preview\exts\ext.furnish.master\data\options.svg","color": 0xFF8A8777}
+        option_style = {"image_url": f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data\options.svg","color": 0xFF8A8777}
         MARGIN = 5
         with self._furni_window.frame:
             with ui.VStack():
@@ -94,7 +94,7 @@ class ExtensionUI():
                 with header_frame:
                     ImageAndTextButton(
                         "Set All",
-                        image_path="D:\Exts\exts-design-preview\exts\ext.furnish.master\data/add.svg",
+                        image_path="D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data/add.svg",
                         width=80,
                         height=25,
                         image_width=14,
@@ -161,7 +161,7 @@ class ExtensionUI():
             return url
             
         def drag_area(item):
-            url = 'D:\Exts\exts-design-preview\exts\ext.furnish.master\data' + '/' + self.selected_category.lower() + '/' + item
+            url = 'D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data' + '/' + self.selected_category.lower() + '/' + item
             item=str(item).split('.')
             with ui.VStack(
                 width=130,
@@ -209,9 +209,10 @@ class ExtensionUI():
         pass
         
     def on_simulation_clicked(self, X, Y, B, M):
-        self.model.allchair_variants_changed(self.chair)
-        self.model.allcomputer_variants_changed(self.monitor)
-        self.model.allmachine_variants_changed(self.machine)
+        if self._menu_win.menu_value[0]:
+            self.model.allchair_variants_changed(self.chair)
+            self.model.allcomputer_variants_changed(self.monitor)
+            self.model.allmachine_variants_changed(self.machine)
         if self._menu_win.menu_value[1]:
             self.model.all_transform_changed()
 

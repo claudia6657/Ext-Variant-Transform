@@ -36,9 +36,7 @@ class OptionMenu():
                     checkbox.model.add_value_changed_fn(lambda check: self.check_menu_value(content[2], check.get_value_as_bool()))
     
     def check_menu_value(self, content, value):
-        print(content, value)
         for i in range(len(self.menu_item)):
             if content == self.menu_item[i]:
                 self.menu_value[i] = value 
-        print(self.menu_value)
         
