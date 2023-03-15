@@ -58,20 +58,20 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
         category = None
         multiSelect = False
         
-        def recount(variantList, pathList,selected):
+        def recount(variantList, pathList, selected, trans):
             for i in variantList:
                     path = str(i.GetPath())
                     
                     if path in selected:
                         index = variantList.index(i)
                         self._ui.selected_variant.append(i)
-                        self._ui.model.transform.insert(2,self._ui.model.Get_VariantItem_transform(pathList[index]))
+                        self._ui.model.transform.insert(trans,self._ui.model.Get_VariantItem_transform(pathList[index]))
                         select = pathList[index].split('/OmniVariants')[0]
                         self._ui.selected_variantPath.append(select)
                         selection = usd_context.get_selection().set_selected_prim_paths(self._ui.selected_variantPath, True)
+                        self._ui.model.newTransform[trans] = select
                         break
         
-        print(prim_paths)
         for selected in prim_paths:
             if selected in self._ui.selected_variantPath:
                 multiSelect = True
@@ -81,23 +81,21 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
                     self._ui.selected_variant = []
                     self._ui.selected_variantPath = []
                 category = 'Chair'
-                recount(self._ui.model.chairVariantList, self._ui.model.chairPath, selected)
+                recount(self._ui.model.chairVariantList, self._ui.model.chairPath, selected, 0)
 
             if 'Computer' in selected:
                 if category != 'Computer' and not multiSelect:
                     self._ui.selected_variant = []
                     self._ui.selected_variantPath = []
                 category = 'Computer'
-                recount(self._ui.model.computorVariantList, self._ui.model.computerPath, selected)
+                recount(self._ui.model.computorVariantList, self._ui.model.computerPath, selected, 1)
                 
             if 'Machine' in selected:
                 if category != 'Machine' and not multiSelect:
                     self._ui.selected_variant = []
                     self._ui.selected_variantPath = []
                 category = 'Machine'
-                recount(self._ui.model.machineVariantList, self._ui.model.machinePath, selected)
-
-        print(self._ui.selected_variant)
+                recount(self._ui.model.machineVariantList, self._ui.model.machinePath, selected, 2)
         
     def unsubscribe(self):
         if self._stage_event_sub:

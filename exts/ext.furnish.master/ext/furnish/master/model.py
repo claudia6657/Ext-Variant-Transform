@@ -16,6 +16,10 @@ class ExtensionModel():
         self.transform.append(self.Get_VariantItem_transform(self.chairPath[-1]))
         self.transform.append(self.Get_VariantItem_transform(self.computerPath[-1]))
         self.transform.append(self.Get_VariantItem_transform(self.machinePath[-1]))
+        self.newChairTransform = None
+        self.newMachineTransform = None
+        self.newComputerTransform = None
+        self.newTransform = [self.newChairTransform, self.newComputerTransform, self.newMachineTransform]
         
         self.machine_variant_names = self.Get_Variant_Names(self.machineVariantList[0])
         self.chair_variant_names = self.Get_Variant_Names(self.chairVariantList[0])
@@ -103,22 +107,31 @@ class ExtensionModel():
     def all_transform_changed(self):
         self.PL = ['/World/PL_01', '/World/PL_02', '/World/PL_03', '/World/PL_04']
         trans_item = [self.chairPath, self.computerPath, self.machinePath]
-        new_chair_trans = self.Get_VariantItem_transform(self.chairPath[-1])
-        new_computer_trans = self.Get_VariantItem_transform(self.computerPath[-1])
-        index = self.machineVariantList.index(self.controller.selected_variant[-1])
-        new_machine_trans = self.Get_VariantItem_transform(self.machinePath[index])
-        new_transform = [new_chair_trans, new_computer_trans, new_machine_trans]
+        new_transform = []
+        ''' If any item transform changed '''
+        for i in range(len(self.newTransform)):
+            if self.newTransform[i]:
+                temp = self.Get_VariantItem_transform(self.newTransform[i])
+                new_transform.append(temp)
+            else:
+                new_transform.append(self.transform[i])
+        print(new_transform)
+        
         for i in range(0, len(new_transform)):
             if new_transform[i] != self.transform[i]:
                 for path in trans_item[i]:
-                    if path != self.machinePath[index]:
+                    if self.newTransform[i] in path:
+                        pass
+                    else:
                         stage = omni.usd.get_context().get_stage()
                         prim = stage.GetPrimAtPath(path)
-                        translate= prim.GetAttribute('xformOp:translate').Get()
-                        prim.GetAttribute('xformOp:translate').Set(translate+(new_transform[i][0]-self.transform[i][0]))
+                        # translate= prim.GetAttribute('xformOp:translate').Get()
+                        rotate = prim.GetAttribute('xformOp:rotateXYZ').Get()
+                        prim.GetAttribute('xformOp:translate').Set(new_transform[i][0])
                         if self.controller._menu_win.menu_value[2]:
-                            prim.GetAttribute('xformOp:rotateXYZ').Set(self.transform[i][1]+(new_transform[i][1]-self.transform[i][1]))
-                        prim.GetAttribute('xformOp:scale').Set(self.transform[i][2]+(new_transform[i][2]-self.transform[i][2]))            
+                            prim.GetAttribute('xformOp:rotateXYZ').Set(rotate+(new_transform[i][1]-self.transform[i][1]))
+                        prim.GetAttribute('xformOp:scale').Set(new_transform[i][2])     
+
 
     def check_variant_prim(self, variant_item):
         stage = omni.usd.get_context().get_stage()

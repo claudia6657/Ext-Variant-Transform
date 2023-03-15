@@ -6,6 +6,8 @@ import omni.kit.viewport.utility
 from .model import ExtensionModel
 from .style import Common_Style, ImageAndTextButton
 from .menu import OptionMenu
+from .tools import ExtensionTool
+
 label_height = 30
 label_width = 150
 Border_radius = 5
@@ -67,6 +69,7 @@ class ExtensionUI():
         self._furni_window.deferred_dock_in("Console")
         self._menu_win = OptionMenu(self)
         self._menu_win.menu_window.visible = False
+        self.tool = ExtensionTool(self)
         
         self.category_item = ['COMPUTER', 'CHAIR', 'MACHINE']
         self.category_model = None
@@ -86,25 +89,19 @@ class ExtensionUI():
         self.selected_variant = []
         self.selected_variantPath = []
         
+        self.Area = []
+        self.tool.Get_Area_Camera()
+        print(self.Area)
         self.build_controller()
     
     def build_controller(self) -> None:
         option_style = {"image_url": f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data\options.svg","color": 0xFF8A8777}
+        measure_style = {"image_url": f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data/measure.svg","color": 0xFF8A8777}
         MARGIN = 5
         with self._furni_window.frame:
             with ui.VStack():
                 header_frame = ui.HStack(height=30)
                 with header_frame:
-                    ImageAndTextButton(
-                        "Set All",
-                        image_path="D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data/add.svg",
-                        width=80,
-                        height=25,
-                        image_width=14,
-                        image_height=14,
-                        mouse_pressed_fn=self.on_simulation_clicked,
-                        tooltip="Add to all setting",
-                    )
                     ui.Spacer(width=MARGIN)
                     with ui.HStack(width=300):
                         ui.Label('Floor', width=50, height=25, alignment=ui.Alignment.CENTER)
@@ -112,12 +109,25 @@ class ExtensionUI():
                     ui.Spacer(width=MARGIN)
                     with ui.HStack(width=300):
                         ui.Label('Area', width=50, height=25, alignment=ui.Alignment.CENTER)
-                        ui.ComboBox(0, 'Office', 'Meeting Room', 'Product Line', 'Others')
+                        ui.ComboBox(0, *self.Area)
                     ui.Spacer(width=MARGIN)
-                    with ui.HStack(width=300):
-                        ui.Label('Zone', width=50, height=25, alignment=ui.Alignment.CENTER)
-                        ui.ComboBox(1, 'A Zone', 'B Zone', 'C Zone', 'D Zone')
+                    ImageAndTextButton(
+                        "Set",
+                        image_path="D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data/add.svg",
+                        width=80,
+                        height=25,
+                        image_width=14,
+                        image_height=14,
+                        mouse_pressed_fn=self.on_simulation_clicked,
+                        tooltip="Execute The changes",
+                    )
                     ui.Spacer(width=MARGIN)
+                    with ui.HStack():
+                        ui.Button(
+                            style=measure_style, width=30, height=25, name='option', tooltip='Measure', 
+                            alignment=ui.Alignment.RIGHT_CENTER,
+                        )
+                        ui.Spacer(width=MARGIN)
                     with ui.HStack():
                         ui.Button(
                             style=option_style, width=30, height=25, name='option', tooltip='Setting', 
