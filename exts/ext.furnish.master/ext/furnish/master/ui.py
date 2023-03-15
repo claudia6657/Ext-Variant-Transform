@@ -1,7 +1,7 @@
 import omni.ui as ui
 import omni.usd
 from omni.ui import color as cl
-import omni.kit.viewport.utility
+from omni.kit.tool.measure import get_instance
 
 from .model import ExtensionModel
 from .style import Common_Style, ImageAndTextButton
@@ -127,6 +127,7 @@ class ExtensionUI():
                         ui.Button(
                             style=measure_style, width=30, height=25, name='option', tooltip='Measure', 
                             alignment=ui.Alignment.RIGHT_CENTER,
+                            mouse_pressed_fn=self.on_mean_tool_pressed
                         )
                         ui.Spacer(width=MARGIN)
                     with ui.HStack():
@@ -204,6 +205,13 @@ class ExtensionUI():
                 for machine in self.machine_options:
                     machine = machine+'.png'
                     drag_area(machine)
+    
+    def on_mean_tool_pressed(self, x, y, btn, m):
+        if btn == 0 and not get_instance()._measure_panel.visible:
+            print(dir(get_instance()))
+            get_instance()._measure_panel.visible = True
+        elif get_instance()._measure_panel.visible:
+            get_instance()._measure_panel.visible = False
     
     def on_area_changed(self, model, item):
         index = model.get_item_value_model().get_value_as_int()
