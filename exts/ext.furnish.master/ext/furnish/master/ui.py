@@ -109,7 +109,8 @@ class ExtensionUI():
                     ui.Spacer(width=MARGIN)
                     with ui.HStack(width=300):
                         ui.Label('Area', width=50, height=25, alignment=ui.Alignment.CENTER)
-                        ui.ComboBox(0, *self.Area)
+                        area_combobox = ui.ComboBox(0, *self.Area)
+                        area_combobox.model.add_item_changed_fn(self.on_area_changed)
                     ui.Spacer(width=MARGIN)
                     ImageAndTextButton(
                         "Set",
@@ -203,6 +204,12 @@ class ExtensionUI():
                 for machine in self.machine_options:
                     machine = machine+'.png'
                     drag_area(machine)
+    
+    def on_area_changed(self, model, item):
+        index = model.get_item_value_model().get_value_as_int()
+        value = model.get_item_value_model(model.get_item_children()[index]).get_value_as_string()
+        self.tool.Load_Area_Position(str(value))
+        print(value)
         
     def on_menu_pressed(self, x, y, btn, m):
         if btn == 0 and not self._menu_win.menu_window.visible:
