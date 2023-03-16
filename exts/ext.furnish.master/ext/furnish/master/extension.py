@@ -2,12 +2,13 @@ import omni.ext
 import omni.usd
 import omni.kit.app
 import carb
+import carb.input
 
 from .ui import ExtensionUI
 from .model import ExtensionModel
 from .history_window import HistoryUI
 from .layer_controller import LayerController
-
+from .keyboardInput import KeyboardInputAction
 class ExtFurnishMasterExtension(omni.ext.IExt):
 
     def on_startup(self, ext_id):
@@ -18,10 +19,15 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
         self._stage_event_sub = omni.usd.get_context().get_stage_event_stream().create_subscription_to_pop(
             self._on_stage_event, name="Stage Open/Closing Listening"
         )        
-        
         self._ui = ExtensionUI(self)
         self._hisui = HistoryUI(self)
         self._layer = LayerController(self)
+        self.key = KeyboardInputAction(self)
+                
+        appwindow = omni.appwindow.get_default_app_window()
+        keyboard = appwindow.get_keyboard()
+        input = carb.input.acquire_input_interface()
+        self._keyboard_sub_id = input.subscribe_to_keyboard_events(keyboard, self.key.on_input)
     
     #======================================
     # Events
@@ -96,7 +102,7 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
                     self._ui.selected_variantPath = []
                 category = 'Machine'
                 recount(self._ui.model.machineVariantList, self._ui.model.machinePath, selected, 2)
-        
+    
     def unsubscribe(self):
         if self._stage_event_sub:
             self._stage_event_sub.unsubscribe()
@@ -135,3 +141,8 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
         if self._stage_event_sub:
             self._stage_event_sub.unsubscribe()
             self._stage_event_sub = None
+        
+        appwindow = omni.appwindow.get_default_app_window()
+        keyboard = appwindow.get_keyboard()
+        input = carb.input.acquire_input_interface()
+        input.unsubscribe_to_keyboard_events(keyboard, self._keyboard_sub_id)

@@ -1,5 +1,5 @@
 import omni.usd
-    
+from .undo import ExtensionUndo
 class ExtensionModel():
 
     def __init__(self, controller):
@@ -24,7 +24,7 @@ class ExtensionModel():
         self.machine_variant_names = self.Get_Variant_Names(self.machineVariantList[0])
         self.chair_variant_names = self.Get_Variant_Names(self.chairVariantList[0])
         self.computer_variant_names = self.Get_Variant_Names(self.computorVariantList[0])
-
+        self.undo = ExtensionUndo(self)
     
     # DEFAULT CATEGORY
     def variantCategory(self, prim):
@@ -89,6 +89,8 @@ class ExtensionModel():
         
         variant = variant_item.GetVariantSets().GetVariantSet("modelingVariant")
         variant.SetVariantSelection(variant_name)
+        
+        self.undo.save_variant(variant_item, variant_name)
         return 1
     
     # Set ALL
@@ -115,7 +117,6 @@ class ExtensionModel():
                 new_transform.append(temp)
             else:
                 new_transform.append(self.transform[i])
-        print(new_transform)
         
         for i in range(0, len(new_transform)):
             if new_transform[i] != self.transform[i]:
@@ -131,7 +132,8 @@ class ExtensionModel():
                         if self.controller._menu_win.menu_value[2]:
                             prim.GetAttribute('xformOp:rotateXYZ').Set(rotate+(new_transform[i][1]-self.transform[i][1]))
                         prim.GetAttribute('xformOp:scale').Set(new_transform[i][2])     
-
+        
+                        self.undo.save_transform(prim, self.transform[i])
 
     def check_variant_prim(self, variant_item):
         stage = omni.usd.get_context().get_stage()
@@ -181,3 +183,5 @@ class ExtensionModel():
         self.chairPath = None
         self.computerPath = None
         self.machinePath = None
+        self.transform  = None
+        self.newTransform = None

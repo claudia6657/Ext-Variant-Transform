@@ -109,7 +109,7 @@ class ExtensionUI():
                     ui.Spacer(width=MARGIN)
                     with ui.HStack(width=300):
                         ui.Label('Area', width=50, height=25, alignment=ui.Alignment.CENTER)
-                        area_combobox = ui.ComboBox(0, *self.Area)
+                        area_combobox = ui.ComboBox(-1, *self.Area)
                         area_combobox.model.add_item_changed_fn(self.on_area_changed)
                     ui.Spacer(width=MARGIN)
                     ImageAndTextButton(
@@ -208,7 +208,6 @@ class ExtensionUI():
     
     def on_mean_tool_pressed(self, x, y, btn, m):
         if btn == 0 and not get_instance()._measure_panel.visible:
-            print(dir(get_instance()))
             get_instance()._measure_panel.visible = True
         elif get_instance()._measure_panel.visible:
             get_instance()._measure_panel.visible = False
@@ -232,17 +231,16 @@ class ExtensionUI():
             self.model.item_changed(cate)
             with self._Select_frame: self.build_pick_stack(cate)
             self._Select_frame.visible = True
-    
-    def on_item_selected(self, ):
-        pass
         
     def on_simulation_clicked(self, X, Y, B, M):
-        if self._menu_win.menu_value[0]:
-            self.model.allchair_variants_changed(self.chair)
-            self.model.allcomputer_variants_changed(self.monitor)
-            self.model.allmachine_variants_changed(self.machine)
-        if self._menu_win.menu_value[1]:
-            self.model.all_transform_changed()
+        if B == 0:
+            if self._menu_win.menu_value[0]:
+                self.model.allchair_variants_changed(self.chair)
+                self.model.allcomputer_variants_changed(self.monitor)
+                self.model.allmachine_variants_changed(self.machine)
+            if self._menu_win.menu_value[1]:
+                self.model.all_transform_changed()
+            self.model.undo.saveUndo()
 
     def _on_mouse_double_clicked(self, btn, item):
         if btn == 0:
@@ -266,6 +264,7 @@ class ExtensionUI():
             if itemvariant:
                 for select in self.selected_variant:
                     self.model.variant_changed(select, itemvariant)
+                self.model.undo.saveUndo()
             else:
                 print(self.selected_category)
         

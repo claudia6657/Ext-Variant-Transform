@@ -12,6 +12,8 @@ class ExtensionTool():
         stage = omni.usd.get_context().get_stage()
         basePrim = stage.GetPrimAtPath(CameraScope)
         
+        if not basePrim:
+            return False
         for i in basePrim.GetChildren():
             self.controller.Area.append(i.GetName())
         
