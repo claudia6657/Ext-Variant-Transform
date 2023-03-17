@@ -36,7 +36,7 @@ class ExtensionModel():
         elif 'Computer' in name:
             self.computorVariantList.append(prim)
             self.computerPath.append(path)
-        elif 'Machine' in name:
+        elif 'Machine' in name and prim not in self.machineVariantList:
             self.machineVariantList.append(prim)
             self.machinePath.append(path)
         
@@ -88,9 +88,18 @@ class ExtensionModel():
             return 0
         
         variant = variant_item.GetVariantSets().GetVariantSet("modelingVariant")
-        variant.SetVariantSelection(variant_name)
+        name = variant.GetVariantNames()
+        if variant_name not in name:
+            return 0
         
-        self.undo.save_variant(variant_item, variant_name)
+        self.undo.save_variant(variant_item, variant.GetVariantSelection())
+        variant.SetVariantSelection(variant_name)
+        return 1
+    
+    def transform_changed(self, prim, trans):
+        prim.GetAttribute('xformOp:translate').Set(trans[0])
+        prim.GetAttribute('xformOp:rotateXYZ').Set(trans[1])
+        prim.GetAttribute('xformOp:scale').Set(trans[2])
         return 1
     
     # Set ALL
@@ -103,6 +112,7 @@ class ExtensionModel():
             self.variant_changed(i, variant_name)
             
     def allmachine_variants_changed(self, variant_name):
+        print('start loop')
         for i in self.machineVariantList:
             self.variant_changed(i, variant_name)
     

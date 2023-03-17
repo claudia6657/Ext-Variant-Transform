@@ -4,7 +4,7 @@ from omni.ui import color as cl
 from omni.kit.tool.measure import get_instance
 
 from .model import ExtensionModel
-from .style import Common_Style, ImageAndTextButton
+from .style import Common_Style, ImageAndTextButton, Icon
 from .menu import OptionMenu
 from .tools import ExtensionTool
 
@@ -81,7 +81,7 @@ class ExtensionUI():
         self.chair_options = self.model.chair_variant_names
         self.monitor_options = self.model.computer_variant_names
         self.machine_options = self.model.machine_variant_names
-        self.model.get_all_variant_prim()
+        
         self.chair = self.model.get_variant_selection('chair')
         self.monitor = self.model.get_variant_selection('monitor')
         self.machine = self.model.get_variant_selection('machine')
@@ -91,12 +91,9 @@ class ExtensionUI():
         
         self.Area = []
         self.tool.Get_Area_Camera()
-        print(self.Area)
         self.build_controller()
     
     def build_controller(self) -> None:
-        option_style = {"image_url": f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data\options.svg","color": 0xFF8A8777}
-        measure_style = {"image_url": f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data/measure.svg","color": 0xFF8A8777}
         MARGIN = 5
         with self._furni_window.frame:
             with ui.VStack():
@@ -125,16 +122,18 @@ class ExtensionUI():
                     ui.Spacer(width=MARGIN)
                     with ui.HStack():
                         ui.Button(
-                            style=measure_style, width=30, height=25, name='option', tooltip='Measure', 
+                            style = Icon.MEASURE_STYLE, width=30, height=30, name='option', tooltip='Measure', 
                             alignment=ui.Alignment.RIGHT_CENTER,
-                            mouse_pressed_fn=self.on_mean_tool_pressed
+                            mouse_pressed_fn=self.on_mean_tool_pressed,
+                            image_url = Icon.Measure
                         )
                         ui.Spacer(width=MARGIN)
                     with ui.HStack():
                         ui.Button(
-                            style=option_style, width=30, height=25, name='option', tooltip='Setting', 
+                            style=Icon.GEAR_STYLE, width=30, height=30, name='option', tooltip='Setting', 
                             alignment=ui.Alignment.RIGHT_CENTER,
-                            mouse_pressed_fn=self.on_menu_pressed
+                            mouse_pressed_fn=self.on_menu_pressed,
+                            image_url = Icon.Gear
                         )
                         ui.Spacer(width=MARGIN)
 
@@ -146,7 +145,7 @@ class ExtensionUI():
                     )
                     with self._Cate_frame:
                         with ui.VStack():
-                            ui.Spacer(height=10)                            
+                            ui.Spacer(height=10)
                             self.category_model = CategoryModel(len(self.category_item), self.category_item)
                             tree_view = ui.TreeView(
                                 self.category_model, root_visible=False, header_visible=False,
@@ -263,7 +262,14 @@ class ExtensionUI():
 
             if itemvariant:
                 for select in self.selected_variant:
-                    self.model.variant_changed(select, itemvariant)
+                    isSucessed = self.model.variant_changed(select, itemvariant)
+                    if not isSucessed:
+                        import omni.kit.notification_manager as nm
+                        nm.post_notification(
+                            'Not Supported! Try Another One.',
+                            hide_after_timeout=True,
+                        )
+                        return False
                 self.model.undo.saveUndo()
             else:
                 print(self.selected_category)

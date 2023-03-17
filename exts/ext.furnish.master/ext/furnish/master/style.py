@@ -26,6 +26,18 @@ class Colors:
     Warn = ui.color.shade(0xCC2222FF)
     Image = ui.color.shade(0xFFA8A8A8)
 
+class Icon:
+    Gear = f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data\gear.svg"
+    Measure = f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data\measure.svg"
+    GEAR_STYLE = {
+        "Button":{"background_color": 0x00000000},
+        "Button:hovered":{"background_color": 0xFF333333}
+    }
+    MEASURE_STYLE = {
+        "Button":{"background_color": 0x00000000},
+        "Button:hovered":{"background_color": 0xFF333333}
+    }
+
 POPUP_MENU_STYLE = {
     "Window": {"background_color": 0xFF232323, "padding": 0, "margin": 0},
 }

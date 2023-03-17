@@ -63,7 +63,7 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
         prim_paths = usd_context.get_selection().get_selected_prim_paths()
         category = None
         multiSelect = False
-        
+
         def recount(variantList, pathList, selected, trans):
             for i in variantList:
                     path = str(i.GetPath())
