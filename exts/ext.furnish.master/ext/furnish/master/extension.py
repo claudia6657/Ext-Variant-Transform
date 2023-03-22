@@ -36,7 +36,7 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
         self._layer.user = self._hisui.user
         set_layer = self._layer.set_layer_by_user()
         '''Return False if no this user's layer'''
-        if set_layer:
+        if set_layer or self._layer.tempLayer:
             self._hisui._user_window.visible = False
             self._hisui.build_history()
         else:
@@ -88,6 +88,7 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
                     self._ui.selected_variantPath = []
                 category = 'Chair'
                 recount(self._ui.model.chairVariantList, self._ui.model.chairPath, selected, 0)
+                self._ui.on_selected_category_changed('CHAIR')
 
             if 'Computer' in selected:
                 if category != 'Computer' and not multiSelect:
@@ -95,6 +96,7 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
                     self._ui.selected_variantPath = []
                 category = 'Computer'
                 recount(self._ui.model.computorVariantList, self._ui.model.computerPath, selected, 1)
+                self._ui.on_selected_category_changed('COMPUTER')
                 
             if 'Machine' in selected:
                 if category != 'Machine' and not multiSelect:
@@ -102,6 +104,7 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
                     self._ui.selected_variantPath = []
                 category = 'Machine'
                 recount(self._ui.model.machineVariantList, self._ui.model.machinePath, selected, 2)
+                self._ui.on_selected_category_changed('MACHINE')
     
     def unsubscribe(self):
         if self._stage_event_sub:

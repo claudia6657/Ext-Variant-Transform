@@ -58,12 +58,13 @@ class LayerController():
         
         if getUserLayer:
             if self.muteStack != []:
+                print(self.muteStack)
                 self.set_layers_mute(self.muteStack)
                 self.muteStack = []
         else:
             return False
 
-        print(self.loadStack)
+        print(self.userBase)
         if self.loadStack:
             self.create_temp_layer(self.loadStack[-1])
             self.set_layers_mute(self.loadStack)
@@ -78,22 +79,25 @@ class LayerController():
         """Mute Other User's Layer"""
         stage = omni.usd.get_context().get_stage()
         for layer in layers:
-            stage.MuteLayer(layer)
+            l = Sdf.Find(layer).identifier
+            stage.MuteLayer(l)
 
     def set_all_layers_unmute(self) -> None:
         """Unmuted All Layers"""
         stage = omni.usd.get_context().get_stage()
         self.mutedLayerStack = stage.GetMutedLayers()
-        if len(self.mutedLayerStack) == 0:
+        if self.mutedLayerStack == []:
             return True
 
+        print(self.mutedLayerStack)
         for layer in self.mutedLayerStack:
-            identifier = Sdf.Find(layer).identifier
-            stage.UnmuteLayer(identifier)
+            l = Sdf.Find(layer).identifier
+            stage.UnmuteLayer(l)
         return True
 
     def default_layer_setting(self):
         """Default Setting Layer Stacks"""
+        import omni.kit.commands
         stage = omni.usd.get_context().get_stage()
         self.layerStack = stage.GetLayerStack()
         self.mutedLayerStack = stage.GetMutedLayers()
@@ -108,7 +112,7 @@ class LayerController():
         for layer in self.layerStack:
             if layer == self.rootLayer:
                 pass
-            elif layer in BaseLayer or layer in nucleusBaseLayer:
+            elif layer.identifier in BaseLayer or layer.identifier in nucleusBaseLayer:
                 self.BaseLayer = layer
             elif 'User' in layer.identifier:
                 self.userLayerStack.append(layer.identifier)
@@ -118,7 +122,8 @@ class LayerController():
                 identifier = Sdf.Find(layer).identifier
                 if 'User' in identifier:
                     self.userLayerStack.append(identifier)
-        #print(self.userLayerStack)
+        print(self.userLayerStack)
+        print(self.BaseLayer)
 
     # ===================================================================================
     # Layer File Commands
@@ -127,7 +132,7 @@ class LayerController():
     def create_temp_layer(self, targetLayer):
         index = len(self.loadStack)
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
-        print(targetLayer, path)
+        self.tempLayer = path
         self.export_layer(targetLayer, path)
         
         self.tempLayer = path
@@ -155,6 +160,7 @@ class LayerController():
         
     def create_sublayer(self):
         """New Layer"""
+        import omni.kit.commands
         index = len(self.loadStack)
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
 
@@ -172,6 +178,7 @@ class LayerController():
         self.tempLayer = path
 
     def replace_layer(self, layer_position, relative_path):
+        import omni.kit.commands
         stage = omni.usd.get_context().get_stage()
 
         path = self.usedLayer + relative_path
@@ -184,6 +191,7 @@ class LayerController():
             )
 
     def export_layer(self, targetLayer, path):
+        import omni.kit.commands
         # Copy and Paste Layer
         l = Sdf.Find(targetLayer)
         export = l.Export(path)

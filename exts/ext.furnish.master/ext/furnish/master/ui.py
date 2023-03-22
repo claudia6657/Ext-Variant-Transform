@@ -1,5 +1,6 @@
 import omni.ui as ui
 import omni.usd
+import os
 from omni.ui import color as cl
 from omni.kit.tool.measure import get_instance
 
@@ -8,13 +9,13 @@ from .style import Common_Style, ImageAndTextButton, Icon
 from .menu import OptionMenu
 from .tools import ExtensionTool
 
+filepath = os.path.dirname(os.path.abspath(__file__))
 label_height = 30
 label_width = 150
 Border_radius = 5
 Margin = 5
 
 Collapse_frame_Height = 80
-chairPath = '/World/F7_OfficeSeatTypeBGroup_v1/OfficeSeatTypeB_170x202x132_v1_004/OfficeSeatTypeBChair'
 class CategoryItem(ui.AbstractItem):
     """Single item of the model"""
 
@@ -111,7 +112,7 @@ class ExtensionUI():
                     ui.Spacer(width=MARGIN)
                     ImageAndTextButton(
                         "Set",
-                        image_path="D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data/add.svg",
+                        image_path=filepath + "\data/add.svg",
                         width=80,
                         height=25,
                         image_width=14,
@@ -175,7 +176,7 @@ class ExtensionUI():
             return url
             
         def drag_area(item):
-            url = 'D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data' + '/' + self.selected_category.lower() + '/' + item
+            url = filepath + '\data' + '/' + self.selected_category.lower() + '/' + item
             item=str(item).split('.')
             with ui.VStack(
                 width=130,
@@ -222,6 +223,12 @@ class ExtensionUI():
         else:
             self._menu_win.menu_window.visible = False
 
+    def on_selected_category_changed(self, cate):
+        self.selected_category = cate
+        with self._Select_frame: 
+            self.build_pick_stack(cate)
+        self._Select_frame.visible = True
+        
     def on_category_selection_changed(self, selected_items):
         for item in selected_items:
             cate = item.name_model.as_string

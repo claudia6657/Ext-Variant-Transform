@@ -1,6 +1,8 @@
 from omni import ui
 from omni.ui import color as cl
 from functools import partial
+import os
+filepath = os.path.dirname(os.path.abspath(__file__))
 
 label_height = 30
 label_width = 150
@@ -27,8 +29,8 @@ class Colors:
     Image = ui.color.shade(0xFFA8A8A8)
 
 class Icon:
-    Gear = f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data\gear.svg"
-    Measure = f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data\measure.svg"
+    Gear =  filepath + "\data\gear.svg"
+    Measure = filepath + "\data\measure.svg"
     GEAR_STYLE = {
         "Button":{"background_color": 0x00000000},
         "Button:hovered":{"background_color": 0xFF333333}
