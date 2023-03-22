@@ -91,8 +91,8 @@ class ExtensionUI():
         self.selected_variantPath = []
         
         self.Area = []
-        self.tool.Get_Area_Camera()
-        self.build_controller()
+        # self.tool.Get_Area_Camera()
+        # self.build_controller()
     
     def build_controller(self) -> None:
         MARGIN = 5

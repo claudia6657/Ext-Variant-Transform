@@ -180,13 +180,11 @@ class HistoryUI():
     def build_history(self) -> None:
         layerpath = self.controller._layer.userBase
         layer = layerpath.split('/')
-        option_style = {"image_url": f"D:\Omniverse\Exts\Ext-Transform-Variant\exts\ext.furnish.master\data\options.svg","color": 0xFF8A8777}
         with self._history_window.frame:
             with ui.VStack(width=ui.Percent(100), height=ui.Percent(100), style=Common_Style):                
                 ui.Spacer(height=5)
                 with ui.HStack(height=40):
                     ui.Label(self.user, name="TITLE")
-                    ui.Button(style=option_style, width=35, height=30, name='option', tooltip='Setting')
                 ui.Label(layer[-1], height=25, name="SUBTITLE")
                 ui.Spacer(height=5)
                 self._Hist_frame = self.build_history_list()
