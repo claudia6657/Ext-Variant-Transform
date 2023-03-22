@@ -2,7 +2,8 @@ import omni.usd
 from pxr import Sdf, Usd
 import omni.kit.commands
 
-BaseLayer = ['omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/F7_OfficeSeatTypeBGroup_v1.usd']
+BaseLayer = ['D:\Omniverse\AI_Park\AI_Project_Jan_v2\AI_arc_0317_VariantPL.usd']
+nucleusBaseLayer = ['omniverse://wih-nucleus/DigitalTwin_Projects/AIArc_Project/AI_Project/AI_Project_Jan/AI_arc_0317_VariantPL.usd']
 
 class LayerController():
     
@@ -39,7 +40,7 @@ class LayerController():
         self.muteStack = []
         
         for layer in self.userLayerStack:
-            layerName = 'Layer_' + self.user
+            layerName = 'User_' + self.user
             if layer == stage.GetEditTarget().GetLayer().identifier:
                 self.usedLayer = layer
                 getUserLayer = True
@@ -62,8 +63,9 @@ class LayerController():
         else:
             return False
 
+        print(self.loadStack)
         if self.loadStack:
-            self.create_temp_layer(self.loadStack[0])
+            self.create_temp_layer(self.loadStack[-1])
             self.set_layers_mute(self.loadStack)
                         
         return True
@@ -106,15 +108,15 @@ class LayerController():
         for layer in self.layerStack:
             if layer == self.rootLayer:
                 pass
-            elif layer in BaseLayer:
+            elif layer in BaseLayer or layer in nucleusBaseLayer:
                 self.BaseLayer = layer
-            elif 'Layer' in layer.identifier:
+            elif 'User' in layer.identifier:
                 self.userLayerStack.append(layer.identifier)
         
         if self.mutedLayerStack:
             for layer in self.mutedLayerStack:
                 identifier = Sdf.Find(layer).identifier
-                if 'Layer' in identifier:
+                if 'User' in identifier:
                     self.userLayerStack.append(identifier)
         #print(self.userLayerStack)
 
@@ -124,8 +126,10 @@ class LayerController():
     
     def create_temp_layer(self, targetLayer):
         index = len(self.loadStack)
-        path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/Layer_'+self.user+'_'+str(index)+'.usd'
+        path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
+        print(targetLayer, path)
         self.export_layer(targetLayer, path)
+        
         self.tempLayer = path
         
         return True
@@ -134,7 +138,7 @@ class LayerController():
         """New User New Layer"""
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/' + self.user
         self.create_folder(path)    
-        path = path + '/Layer_' + self.user + '.usd'
+        path = path + '/User_' + self.user + '.usd'
 
         stage = omni.usd.get_context().get_stage()
         Sdf.Layer.CreateNew(path)
@@ -152,7 +156,7 @@ class LayerController():
     def create_sublayer(self):
         """New Layer"""
         index = len(self.loadStack)
-        path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/Layer_'+self.user+'_'+str(index)+'.usd'
+        path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
 
         Sdf.Layer.CreateNew(path)
         omni.kit.commands.execute(
@@ -165,6 +169,7 @@ class LayerController():
         )
         omni.kit.commands.execute("SetEditTarget", layer_identifier=path)
         self.usedLayer = path
+        self.tempLayer = path
 
     def replace_layer(self, layer_position, relative_path):
         stage = omni.usd.get_context().get_stage()
@@ -198,12 +203,17 @@ class LayerController():
 
     def save_layer(self, command):
         # Save Layer with checkpoints
-        stage = omni.usd.get_context().get_stage()        
+        stage = omni.usd.get_context().get_stage()    
         dirty = omni.usd.get_dirty_layers(stage, True)
         omni.kit.window.file.save_layers(
             '', dirty, None, True, command
         )
+        self.loadStack.append(self.tempLayer)
+        print(self.loadStack)
+        self.create_temp_layer(self.loadStack[-1])
+        self.set_layers_mute([self.loadStack[-1]])
         return True
+
     #======================================================================================
     # Layer Commands
     #======================================================================================

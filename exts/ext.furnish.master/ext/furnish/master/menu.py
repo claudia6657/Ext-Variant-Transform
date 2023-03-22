@@ -13,7 +13,7 @@ class OptionMenu():
     def build_menu(self):
         with self.menu_window.frame:
             with ui.VStack():
-                ui.Label('Set Selected Options', height=30)
+                ui.Label('Set Options', height=30)
                 ui.Separator(height=5)
                 content = []
                 with ui.HStack(height=20, alignmemt=ui.Alignment.LEFT_TOP, style={"margin_hieght":2}):

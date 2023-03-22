@@ -60,6 +60,20 @@ class HistoryModel(ui.AbstractItemModel):
 
 class HistoryDelegate(ui.AbstractItemDelegate):
     
+    def on_checkpoint_selection_changed(self, selected_items:HistoryItem):
+        for item in selected_items:
+            cp = item.relative_model.as_string
+            self.selected_checkpoint = cp
+        
+    def _on_mouse_double_clicked(self, x, y, btn, m):
+        if btn == 0:
+            stage = omni.usd.get_context().get_stage()
+            for i in self.controller._layer.userLayerStack:
+                if self.selected_checkpoint in i:
+                    CP = i
+            if CP:
+                LayerController.export_layer(CP, stage.GetEditTarget().GetLayer().identifier)
+
     def build_widget(self, model, item, column_id, level, expanded):
         # TreeView Widget
         with ui.HStack(width=20):
@@ -151,10 +165,10 @@ class HistoryUI():
         })
         with self._save_window.frame:
             with ui.VStack(style=Save_Window_Style):
-                ui.Label('Add New Checkpoint' ,name='title' ,alignment=ui.Alignment.CENTER)
+                ui.Label('Save New File' ,name='title' ,alignment=ui.Alignment.CENTER)
                 ui.Line()
                 command = ui.Label(self.command, visible=False)
-                ui.Label('Command:', alignment=ui.Alignment.LEFT_BOTTOM, name='command_Field')
+                ui.Label('Comment:', alignment=ui.Alignment.LEFT_BOTTOM, name='command_Field')
                 commandField = ui.StringField(height=40, alignment=ui.Alignment.H_CENTER)
                 commandField.model.add_value_changed_fn(
                     lambda m, l=command:self.setCommand(m.get_value_as_string(), command)
@@ -212,6 +226,7 @@ class HistoryUI():
         for item in selected_items:
             cp = item.relative_model.as_string
             self.selected_checkpoint = cp
+            print(self.selected_checkpoint)
         
     def _on_mouse_double_clicked(self, x, y, btn, m):
         if btn == 0:
@@ -242,7 +257,7 @@ class HistoryUI():
         
         ''' update '''
         self._save_window.visible = False
-        self.historyStack.insert(0, '')
+        self.historyStack.insert(0, stage.GetEditTarget().GetLayer().identifier)
         self.historyStack.insert(1, self.command)
         self.historyStack.insert(2, self.user)
         self.historyStack.insert(3, str(datetime.now()))

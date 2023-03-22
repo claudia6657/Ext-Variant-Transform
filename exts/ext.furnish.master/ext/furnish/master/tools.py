@@ -1,7 +1,7 @@
 import omni.usd
 from omni.kit.viewport.utility import get_active_viewport
 
-CameraScope = '/World/Area'
+CameraScope = '/World/AreaCamera'
 
 class ExtensionTool():
     

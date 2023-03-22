@@ -1,4 +1,5 @@
 import omni.usd
+from pxr import Gf
 from .undo import ExtensionUndo
 class ExtensionModel():
 
@@ -86,14 +87,36 @@ class ExtensionModel():
     def variant_changed(self, variant_item, variant_name):
         if variant_item == None:
             return 0
-        
+
+                 
         variant = variant_item.GetVariantSets().GetVariantSet("modelingVariant")
         name = variant.GetVariantNames()
         if variant_name not in name:
             return 0
         
-        self.undo.save_variant(variant_item, variant.GetVariantSelection())
-        variant.SetVariantSelection(variant_name)
+        old_variant_name = variant.GetVariantSelection()
+        self.undo.save_variant(variant_item, old_variant_name)
+        variant.SetVariantSelection(variant_name)        
+        
+        """ REFLOW MODEL ISSUE """
+        stage = omni.usd.get_context().get_stage()         
+
+        path = str(variant_item.GetPath()).split('/OmniVariants')[0]
+        prim = stage.GetPrimAtPath(path)
+        if variant_name == 'Reflow':
+            temp = [
+                prim.GetAttribute('xformOp:translate').Get(),
+                prim.GetAttribute('xformOp:rotateXYZ').Get()+Gf.Vec3d(0, 90, 0),
+                prim.GetAttribute('xformOp:scale').Get()
+            ]
+            self.transform_changed(prim, temp)
+        if old_variant_name == 'Reflow':
+            temp = [
+                prim.GetAttribute('xformOp:translate').Get(),
+                prim.GetAttribute('xformOp:rotateXYZ').Get()-Gf.Vec3d(0, 90, 0),
+                prim.GetAttribute('xformOp:scale').Get()
+            ]
+            self.transform_changed(prim, temp)
         return 1
     
     def transform_changed(self, prim, trans):

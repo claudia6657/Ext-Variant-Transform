@@ -117,7 +117,7 @@ class ExtensionUI():
                         image_width=14,
                         image_height=14,
                         mouse_pressed_fn=self.on_simulation_clicked,
-                        tooltip="Execute The changes",
+                        tooltip = 'Set To All'
                     )
                     ui.Spacer(width=MARGIN)
                     with ui.HStack():
@@ -197,7 +197,6 @@ class ExtensionUI():
                 drag_area("SamSung_Laptop.png")
             if category == 'Chair' or category == 'CHAIR':
                 drag_area("Anora.png")
-                drag_area("Cooper.png")
                 drag_area("Newman.png")
                 drag_area("Phineas.png")
             if category == 'Machine' or category == 'MACHINE':
@@ -234,9 +233,12 @@ class ExtensionUI():
     def on_simulation_clicked(self, X, Y, B, M):
         if B == 0:
             if self._menu_win.menu_value[0]:
-                self.model.allchair_variants_changed(self.chair)
-                self.model.allcomputer_variants_changed(self.monitor)
-                self.model.allmachine_variants_changed(self.machine)
+                if self.selected_category.lower() == 'chair':
+                    self.model.allchair_variants_changed(self.chair)
+                if self.selected_category.lower() == 'computer':
+                    self.model.allcomputer_variants_changed(self.monitor)
+                if self.selected_category.lower() == 'machine':
+                    self.model.allmachine_variants_changed(self.machine)
             if self._menu_win.menu_value[1]:
                 self.model.all_transform_changed()
             self.model.undo.saveUndo()

@@ -26,8 +26,7 @@ class ExtensionUndo():
         self.lastUndo = [self.prims, self.variants, self.transform]
         self.Undo.append(self.lastUndo)
         self.index = -1
-        print(self.Undo[-1])
-        print(self.Undo)
+
         self.lastUndo = []
         self.prims = []
         self.variants = []

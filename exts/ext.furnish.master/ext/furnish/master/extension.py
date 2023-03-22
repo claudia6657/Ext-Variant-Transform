@@ -66,17 +66,17 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
 
         def recount(variantList, pathList, selected, trans):
             for i in variantList:
-                    path = str(i.GetPath())
-                    
-                    if path in selected:
-                        index = variantList.index(i)
-                        self._ui.selected_variant.append(i)
-                        self._ui.model.transform.insert(trans,self._ui.model.Get_VariantItem_transform(pathList[index]))
-                        select = pathList[index].split('/OmniVariants')[0]
-                        self._ui.selected_variantPath.append(select)
-                        selection = usd_context.get_selection().set_selected_prim_paths(self._ui.selected_variantPath, True)
-                        self._ui.model.newTransform[trans] = select
-                        break
+                path = str(i.GetPath())
+                
+                if path in selected:
+                    index = variantList.index(i)
+                    self._ui.selected_variant.append(i)
+                    self._ui.model.transform.insert(trans,self._ui.model.Get_VariantItem_transform(pathList[index]))
+                    select = pathList[index].split('/OmniVariants')[0]
+                    self._ui.selected_variantPath.append(select)
+                    selection = usd_context.get_selection().set_selected_prim_paths(self._ui.selected_variantPath, True)
+                    self._ui.model.newTransform[trans] = select
+                    break
         
         for selected in prim_paths:
             if selected in self._ui.selected_variantPath:
