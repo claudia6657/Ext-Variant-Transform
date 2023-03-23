@@ -91,6 +91,7 @@ class ExtensionUI():
         self.selected_variantPath = []
         
         self.Area = []
+        self.Floor = []
         # self.tool.Get_Area_Camera()
         # self.build_controller()
     

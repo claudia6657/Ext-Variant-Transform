@@ -1,6 +1,7 @@
 import omni.ui as ui
 import omni.usd
 from omni.kit.usd.layers import LayerUtils
+from omni.kit.viewport.utility import get_active_viewport_window
 from datetime import datetime
 from .style import User_Enter_Style, History_Frame_Style, Save_Window_Style, Common_Style
 
@@ -94,11 +95,11 @@ class HistoryUI():
     def __init__(self, controller, **kwargs):
         self.controller = controller 
         self._user_window = ui.Window('Login')
-        self._user_window.setPosition(600, 400)
         self._history_window = ui.Window("File Control")
         self._history_window.deferred_dock_in("Property")
         self._save_window = None
-        
+        self.viewport_W = get_active_viewport_window().frame.computed_content_width
+        self.viewport_H = get_active_viewport_window().frame.computed_content_height
         self.user = ''
         self.command = ''
         self.build_user()
@@ -115,6 +116,9 @@ class HistoryUI():
         })
         self._user_window.width = 320
         self._user_window.height = 150
+        pos = [(self.viewport_W - self._user_window.width)/2, (self.viewport_H - self._user_window.height)/2]
+        self._user_window.setPosition(pos[0], pos[1])
+        
         with self._user_window.frame:
             with ui.VStack(style=User_Enter_Style):
                 self.build_user_frame()
