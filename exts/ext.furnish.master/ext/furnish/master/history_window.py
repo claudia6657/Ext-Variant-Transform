@@ -1,9 +1,10 @@
 import omni.ui as ui
 import omni.usd
+import omni.kit.commands
 from omni.kit.usd.layers import LayerUtils
 from omni.kit.viewport.utility import get_active_viewport_window
 from datetime import datetime
-from .style import User_Enter_Style, History_Frame_Style, Save_Window_Style, Common_Style
+from .style import User_Enter_Style, History_Frame_Style, Save_Window_Style, Common_Style, Icon
 
 from .layer_controller import LayerController
 
@@ -60,20 +61,6 @@ class HistoryModel(ui.AbstractItemModel):
         self._item_changed(None)
 
 class HistoryDelegate(ui.AbstractItemDelegate):
-    
-    def on_checkpoint_selection_changed(self, selected_items:HistoryItem):
-        for item in selected_items:
-            cp = item.relative_model.as_string
-            self.selected_checkpoint = cp
-        
-    def _on_mouse_double_clicked(self, x, y, btn, m):
-        if btn == 0:
-            stage = omni.usd.get_context().get_stage()
-            for i in self.controller._layer.userLayerStack:
-                if self.selected_checkpoint in i:
-                    CP = i
-            if CP:
-                LayerController.export_layer(CP, stage.GetEditTarget().GetLayer().identifier)
 
     def build_widget(self, model, item, column_id, level, expanded):
         # TreeView Widget
@@ -102,6 +89,7 @@ class HistoryUI():
         self.viewport_H = get_active_viewport_window().frame.computed_content_height
         self.user = ''
         self.command = ''
+        self.selected_checkpoint = None
         self.build_user()
         
         self._mouse_double_clicked_fn = kwargs.get("mouse_double_clicked_fn", None)
@@ -158,7 +146,9 @@ class HistoryUI():
         
     def build_save_window(self) -> None:
         self._save_window = ui.Window('Save', width=350, height=200)
-        self._save_window.setPosition(600, 400)
+        
+        pos = [(self.viewport_W - self._save_window.width)/2, (self.viewport_H - self._save_window.height)/2]
+        self._save_window.setPosition(pos[0], pos[1])
         self._save_window.flags = ui.WINDOW_FLAGS_NO_COLLAPSE|ui.WINDOW_FLAGS_NO_TITLE_BAR|ui.WINDOW_FLAGS_NO_SCROLLBAR|ui.WINDOW_FLAGS_NO_RESIZE
         self._save_window.frame.set_style({
             "Window": {
@@ -189,7 +179,15 @@ class HistoryUI():
                 ui.Spacer(height=5)
                 with ui.HStack(height=40):
                     ui.Label(self.user, name="TITLE")
-                ui.Label(layer[-1], height=25, name="SUBTITLE")
+                with ui.HStack(height=40):
+                    ui.Label(layer[-1], height=25, width=100, name="SUBTITLE")
+                    ui.Button(
+                        style = Icon.SAVE_STYLE, width=30, height=30, name='save', tooltip='Save', 
+                        alignment=ui.Alignment.LEFT_CENTER,
+                        mouse_pressed_fn=self.controller._layer.save_stage,
+                        image_url = Icon.Save
+                    )
+                    ui.Spacer()
                 ui.Spacer(height=5)
                 self._Hist_frame = self.build_history_list()
     
@@ -232,12 +230,8 @@ class HistoryUI():
         
     def _on_mouse_double_clicked(self, x, y, btn, m):
         if btn == 0:
-            stage = omni.usd.get_context().get_stage()
-            for i in self.controller._layer.userLayerStack:
-                if self.selected_checkpoint in i:
-                    CP = i
-            if CP:
-                self.controller._layer.export_layer(CP, stage.GetEditTarget().GetLayer().identifier)
+            if self.selected_checkpoint:
+                layer = self.controller._layer.transfer_Layer(self.selected_checkpoint)
         
     def _on_mouse_pressed_add_new(self, btn, item):
         if btn == 0:
@@ -255,11 +249,11 @@ class HistoryUI():
     def _on_clicked_save_btn(self):
         # Save New
         stage = omni.usd.get_context().get_stage()        
-        self.controller._layer.save_layer(self.command)
+        IDENTIFIER = self.controller._layer.save_layer(self.command)
         
         ''' update '''
         self._save_window.visible = False
-        self.historyStack.insert(0, stage.GetEditTarget().GetLayer().identifier)
+        self.historyStack.insert(0, IDENTIFIER.split('/')[-1])
         self.historyStack.insert(1, self.command)
         self.historyStack.insert(2, self.user)
         self.historyStack.insert(3, str(datetime.now()))

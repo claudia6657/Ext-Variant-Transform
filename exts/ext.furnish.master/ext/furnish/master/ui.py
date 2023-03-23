@@ -104,7 +104,8 @@ class ExtensionUI():
                     ui.Spacer(width=MARGIN)
                     with ui.HStack(width=300):
                         ui.Label('Floor', width=50, height=25, alignment=ui.Alignment.CENTER)
-                        ui.ComboBox(10, 'B4', 'B3', 'B2', 'B1', '1F', '2F', '3F', '4F', '5F', '6F', '7F', '8F', '9F', '10F', '11F', '12F', 'RF')
+                        floor_combobox = ui.ComboBox(-1, *self.Floor)
+                        floor_combobox.model.add_item_changed_fn(self.on_floor_changed)
                     ui.Spacer(width=MARGIN)
                     with ui.HStack(width=300):
                         ui.Label('Area', width=50, height=25, alignment=ui.Alignment.CENTER)
@@ -216,6 +217,12 @@ class ExtensionUI():
         index = model.get_item_value_model().get_value_as_int()
         value = model.get_item_value_model(model.get_item_children()[index]).get_value_as_string()
         self.tool.Load_Area_Position(str(value))
+        print(value)
+        
+    def on_floor_changed(self, model, item):
+        index = model.get_item_value_model().get_value_as_int()
+        value = model.get_item_value_model(model.get_item_children()[index]).get_value_as_string()
+        self.tool.Load_Floor_Position(str(value))
         print(value)
         
     def on_menu_pressed(self, x, y, btn, m):

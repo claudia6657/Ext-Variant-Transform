@@ -64,9 +64,9 @@ class LayerController():
         else:
             return False
 
-        print(self.userBase)
+        print(self.loadStack)
         if self.loadStack:
-            self.create_temp_layer(self.loadStack[-1])
+            self.create_temp_layer(self.loadStack[0])
             self.set_layers_mute(self.loadStack)
                         
         return True
@@ -79,9 +79,18 @@ class LayerController():
         """Mute Other User's Layer"""
         stage = omni.usd.get_context().get_stage()
         for layer in layers:
-            l = Sdf.Find(layer).identifier
-            stage.MuteLayer(l)
+            if layer == self.usedLayer:
+                pass
+            else:
+                l = Sdf.Find(layer).identifier
+                stage.MuteLayer(l)
 
+    def set_layer_unmute(self, layers):
+        """layer - identifier"""
+        stage = omni.usd.get_context().get_stage()
+        for layer in layers:
+            stage.UnmuteLayer(layer)
+        
     def set_all_layers_unmute(self) -> None:
         """Unmuted All Layers"""
         stage = omni.usd.get_context().get_stage()
@@ -134,13 +143,20 @@ class LayerController():
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
         self.tempLayer = path
         self.export_layer(targetLayer, path)
-        
-        self.tempLayer = path
+        self.loadStack.append(path)
         
         return True
+    
+    def transfer_Layer(self, path):
+        path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/' + self.user + '/' +path
+        layer = Sdf.Find(path).identifier
+        stage = omni.usd.get_context().get_stage()
+        self.export_layer(path, stage.GetEditTarget().GetLayer().identifier)
+        return layer
 
     def create_newUserLayer(self):
         """New User New Layer"""
+        
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/' + self.user
         self.create_folder(path)    
         path = path + '/User_' + self.user + '.usd'
@@ -211,17 +227,41 @@ class LayerController():
 
     def save_layer(self, command):
         # Save Layer with checkpoints
-        stage = omni.usd.get_context().get_stage()    
+        stage = omni.usd.get_context().get_stage()
+        LAYER = self.save_as(stage.GetEditTarget().GetLayer().identifier)
+        
         dirty = omni.usd.get_dirty_layers(stage, True)
+        
         omni.kit.window.file.save_layers(
             '', dirty, None, True, command
         )
-        self.loadStack.append(self.tempLayer)
         print(self.loadStack)
-        self.create_temp_layer(self.loadStack[-1])
-        self.set_layers_mute([self.loadStack[-1]])
-        return True
+        return LAYER
 
+    def save_as(self, target):
+        import omni.kit.commands
+        index = len(self.loadStack)
+        path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
+        l = Sdf.Find(target)
+        export = l.Export(path)
+        if export:
+            omni.kit.commands.execute(
+                "CreateSublayerCommand",
+                layer_identifier=self.userBase,
+                sublayer_position=1,
+                new_layer_path=path,
+                transfer_root_content=False,
+                create_or_insert=False,
+            )
+            self.loadStack.append(path)
+            self.set_layers_mute([path])
+        
+        return path
+
+    def save_stage(self, x, y, btn, m):
+        stage = omni.usd.get_context().get_stage()
+        stage.Save()
+        print('SAVED!!!!!!!!!!')
     #======================================================================================
     # Layer Commands
     #======================================================================================
@@ -229,17 +269,21 @@ class LayerController():
     def get_layer_details(self):
         layerDetails = []
         # Get Checkpoints        
-        for layer in self.loadStack:
-            newestCheckpoints = omni.client.list_checkpoints(layer)[1][-1].comment
-            detail = omni.client.stat(layer)[1]
+        self.BaseLayer
+        for i in range(len(self.loadStack)):
+            t = -1
+            newestCheckpoints = omni.client.list_checkpoints(self.loadStack[i])[1][t].comment
+            if not newestCheckpoints:
+                newestCheckpoints = '. . .'
+            detail = omni.client.stat(self.loadStack[i])[1]
             SIZE = str(detail.size/1000) + ' KB'
-            
             layerDetails.append(detail.relative_path)
+
             layerDetails.append(newestCheckpoints)
+            
             layerDetails.append(self.user)
             layerDetails.append(str(detail.modified_time))
-            layerDetails.append(SIZE)    
-        
+            layerDetails.append(SIZE)
         return layerDetails
         
     #======================================================================================

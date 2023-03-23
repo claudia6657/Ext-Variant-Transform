@@ -31,11 +31,16 @@ class Colors:
 class Icon:
     Gear =  filepath + "\data\gear.svg"
     Measure = filepath + "\data\measure.svg"
+    Save = filepath + "\data\save.svg"
     GEAR_STYLE = {
         "Button":{"background_color": 0x00000000},
         "Button:hovered":{"background_color": 0xFF333333}
     }
     MEASURE_STYLE = {
+        "Button":{"background_color": 0x00000000},
+        "Button:hovered":{"background_color": 0xFF333333}
+    }
+    SAVE_STYLE = {
         "Button":{"background_color": 0x00000000},
         "Button:hovered":{"background_color": 0xFF333333}
     }
