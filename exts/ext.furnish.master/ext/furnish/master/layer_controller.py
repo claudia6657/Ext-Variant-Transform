@@ -1,6 +1,7 @@
 import omni.usd
 from pxr import Sdf, Usd
 import omni.kit.commands
+from omni.kit.usd.layers import LayerUtils
 
 BaseLayer = ['D:\Omniverse\AI_Park\AI_Project_Jan_v2\AI_arc_0317_VariantPL.usd']
 nucleusBaseLayer = ['omniverse://wih-nucleus/DigitalTwin_Projects/AIArc_Project/AI_Project/AI_Project_Jan/AI_arc_0317_VariantPL.usd']
@@ -24,7 +25,7 @@ class LayerController():
         self.default_layer_setting()
 
     def set_layer_by_user(self):
-        """Change Authoring Layer"""
+        """Login"""
         stage = omni.usd.get_context().get_stage()
         self.default_layer_setting()
         
@@ -66,9 +67,10 @@ class LayerController():
 
         print(self.loadStack)
         if self.loadStack:
-            self.create_temp_layer(self.loadStack[0])
+            self.get_temp_layer()
             self.set_layers_mute(self.loadStack)
-                        
+        else:
+            self.create_temp_layer()
         return True
     
     # ===========================
@@ -138,16 +140,41 @@ class LayerController():
     # Layer File Commands
     # ===================================================================================
     
-    def create_temp_layer(self, targetLayer):
+    def create_temp_layer(self):
+        '''Create Temp Layer '''
         index = len(self.loadStack)
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
+        stage = omni.usd.get_context().get_stage()
+        omni.kit.commands.execute(
+            "CreateSublayerCommand",
+            layer_identifier=stage.GetRootLayer().identifier,
+            sublayer_position=0,
+            new_layer_path=path,
+            transfer_root_content=False,
+            create_or_insert=False,
+        )
+        omni.kit.commands.execute("SetEditTarget", layer_identifier=path)
         self.tempLayer = path
-        self.export_layer(targetLayer, path)
         self.loadStack.append(path)
         
         return True
     
+    def get_temp_layer(self):
+        '''Get User Temp Layer (SubLayer Position 0)'''
+        target = None
+        for layer in self.loadStack:
+            position = LayerUtils.get_sublayer_position_in_parent(
+                self.userBase, layer
+            )
+            if position == 0:
+                self.tempLayer = layer
+            if position == 1:
+                target = layer
+        if target and self.tempLayer:
+            self.export_layer(target, self.tempLayer)
+        
     def transfer_Layer(self, path):
+        '''Load Target History Layer By Double Click'''
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/' + self.user + '/' +path
         layer = Sdf.Find(path).identifier
         stage = omni.usd.get_context().get_stage()
@@ -190,21 +217,9 @@ class LayerController():
             create_or_insert=True,
         )
         omni.kit.commands.execute("SetEditTarget", layer_identifier=path)
+        self.loadStack.append(path)
         self.usedLayer = path
         self.tempLayer = path
-
-    def replace_layer(self, layer_position, relative_path):
-        import omni.kit.commands
-        stage = omni.usd.get_context().get_stage()
-
-        path = self.usedLayer + relative_path
-        
-        omni.kit.commands.execute(
-            "ReplaceSublayer",
-            layer_identifier=stage.GetRootLayer().identifier,
-            sublayer_position=layer_position,
-            new_layer_path=path
-            )
 
     def export_layer(self, targetLayer, path):
         import omni.kit.commands
@@ -222,23 +237,16 @@ class LayerController():
                 create_or_insert=False,
             )
             omni.kit.commands.execute("SetEditTarget", layer_identifier=path)
-            self.usedLayer = path
         return True
 
     def save_layer(self, command):
         # Save Layer with checkpoints
         stage = omni.usd.get_context().get_stage()
-        LAYER = self.save_as(stage.GetEditTarget().GetLayer().identifier)
-        
-        dirty = omni.usd.get_dirty_layers(stage, True)
-        
-        omni.kit.window.file.save_layers(
-            '', dirty, None, True, command
-        )
-        print(self.loadStack)
+        LAYER = self.save_as(stage.GetEditTarget().GetLayer().identifier, command)
+                
         return LAYER
-
-    def save_as(self, target):
+    def save_as(self, target, command):
+        '''Save Layer As (New File)'''
         import omni.kit.commands
         index = len(self.loadStack)
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
@@ -255,13 +263,17 @@ class LayerController():
             )
             self.loadStack.append(path)
             self.set_layers_mute([path])
-        
+            omni.kit.window.file.save_layers(
+                '', [Sdf.Find(path).identifier], None, True, command
+            )
         return path
 
     def save_stage(self, x, y, btn, m):
+        '''Simplely Save Stage(Including All SubLayer in Stage) No Command'''
         stage = omni.usd.get_context().get_stage()
         stage.Save()
-        print('SAVED!!!!!!!!!!')
+        print('Stage Saved !')
+
     #======================================================================================
     # Layer Commands
     #======================================================================================
