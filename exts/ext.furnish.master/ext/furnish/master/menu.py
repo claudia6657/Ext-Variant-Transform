@@ -1,11 +1,16 @@
 import omni.ui as ui
+from omni.kit.viewport.utility import get_active_viewport_window
+
 from .style import POPUP_MENU_STYLE
 
 class OptionMenu():
     
     def __init__(self, controller):
+        self.controller = controller
+        pos = [get_active_viewport_window().frame.computed_content_width, get_active_viewport_window().frame.computed_content_height]
         self.menu_window = ui.Window('menu', width=200, height=120, style=POPUP_MENU_STYLE)
         self.menu_window.flags = ui.WINDOW_FLAGS_NO_COLLAPSE|ui.WINDOW_FLAGS_NO_RESIZE|ui.WINDOW_FLAGS_NO_TITLE_BAR
+        self.menu_window.setPosition(740, pos[1]+90)
         self.menu_item = ['Variant Items', 'Transform Translation', 'Transform Rotation']
         self.menu_value = [True, True, True]
         self.build_menu()

@@ -1,3 +1,4 @@
+import asyncio
 import omni.usd
 from pxr import Sdf, Usd
 import omni.kit.commands
@@ -81,7 +82,7 @@ class LayerController():
         """Mute Other User's Layer"""
         stage = omni.usd.get_context().get_stage()
         for layer in layers:
-            if layer == self.usedLayer:
+            if layer == self.usedLayer or layer == self.tempLayer:
                 pass
             else:
                 l = Sdf.Find(layer).identifier
@@ -240,18 +241,26 @@ class LayerController():
         return True
 
     def save_layer(self, command):
+        
         # Save Layer with checkpoints
         stage = omni.usd.get_context().get_stage()
         LAYER = self.save_as(stage.GetEditTarget().GetLayer().identifier, command)
-                
+        
         return LAYER
-    def save_as(self, target, command):
+    
+    def save_as(self, target, command):            
         '''Save Layer As (New File)'''
         import omni.kit.commands
+        import omni.client
         index = len(self.loadStack)
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
         l = Sdf.Find(target)
         export = l.Export(path)
+        
+        def save(resault, err):
+            print(resault)
+            omni.client.create_checkpoint(path, command)
+            
         if export:
             omni.kit.commands.execute(
                 "CreateSublayerCommand",
@@ -263,9 +272,11 @@ class LayerController():
             )
             self.loadStack.append(path)
             self.set_layers_mute([path])
+            
             omni.kit.window.file.save_layers(
-                '', [Sdf.Find(path).identifier], None, True, command
+                path, [Sdf.Find(path).identifier], save, True, command
             )
+            
         return path
 
     def save_stage(self, x, y, btn, m):
