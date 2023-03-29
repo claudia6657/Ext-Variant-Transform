@@ -32,6 +32,8 @@ class Icon:
     Gear =  filepath + "\data\gear.svg"
     Measure = filepath + "\data\measure.svg"
     Save = filepath + "\data\save.svg"
+    User = filepath + "\data\menu_refresh.svg"
+    
     GEAR_STYLE = {
         "Button":{"background_color": 0x00000000},
         "Button:hovered":{"background_color": 0xFF333333}
@@ -44,6 +46,7 @@ class Icon:
         "Button":{"background_color": 0x00000000},
         "Button:hovered":{"background_color": 0xFF333333}
     }
+    
 
 POPUP_MENU_STYLE = {
     "Window": {"background_color": 0xFF232323, "padding": 0, "margin": 0},

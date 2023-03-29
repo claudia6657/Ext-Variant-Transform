@@ -172,7 +172,7 @@ class LayerController():
             if position == 1:
                 target = layer
         if target and self.tempLayer:
-            self.export_layer(target, self.tempLayer)
+            omni.kit.commands.execute("SetEditTarget", layer_identifier=self.tempLayer)
         
     def transfer_Layer(self, path):
         '''Load Target History Layer By Double Click'''
@@ -245,6 +245,8 @@ class LayerController():
         # Save Layer with checkpoints
         stage = omni.usd.get_context().get_stage()
         LAYER = self.save_as(stage.GetEditTarget().GetLayer().identifier, command)
+        Sdf.Find(LAYER).comment = command
+        Sdf.Find(LAYER).Save()
         
         return LAYER
     
@@ -256,10 +258,12 @@ class LayerController():
         path = 'omniverse://wih-nucleus/DigitalTwin_Projects/Test/FurnishExt/'+self.user+'/User_'+self.user+'_'+str(index)+'.usd'
         l = Sdf.Find(target)
         export = l.Export(path)
+        stage = omni.usd.get_context().get_stage()
+        dirty = omni.usd.get_dirty_layers(stage, True)
         
         def save(resault, err):
-            print(resault)
-            omni.client.create_checkpoint(path, command)
+            if resault:
+                omni.client.create_checkpoint(path, command)
             
         if export:
             omni.kit.commands.execute(
@@ -274,7 +278,7 @@ class LayerController():
             self.set_layers_mute([path])
             
             omni.kit.window.file.save_layers(
-                path, [Sdf.Find(path).identifier], save, True, command
+                '', dirty, save, True, command
             )
             
         return path
@@ -288,6 +292,11 @@ class LayerController():
     #======================================================================================
     # Layer Commands
     #======================================================================================
+    def get_layer_comment(self, layer):
+        """Get comment by layer(user)"""
+        comment = Sdf.Find(layer).comment
+        
+        return comment
     
     def get_layer_details(self):
         layerDetails = []
@@ -295,7 +304,7 @@ class LayerController():
         self.BaseLayer
         for i in range(len(self.loadStack)):
             t = -1
-            newestCheckpoints = omni.client.list_checkpoints(self.loadStack[i])[1][t].comment
+            newestCheckpoints = self.get_layer_comment(self.loadStack[i])
             if not newestCheckpoints:
                 newestCheckpoints = '. . .'
             detail = omni.client.stat(self.loadStack[i])[1]
@@ -310,7 +319,7 @@ class LayerController():
         return layerDetails
         
     #======================================================================================
-    # Checkpoints (Unused)
+    # Comment
     #======================================================================================
     def get_current_layer_checkpoints(self):
         """Get all Checkpoints by layer(user)"""
@@ -319,20 +328,6 @@ class LayerController():
         checkpoints = omni.client.list_checkpoints(url)[1]
         
         return checkpoints
-    
-    def list_checkpoint_treeview(self):
-        checkpoints = self.get_current_layer_checkpoints()
-        checkpointList = []
-        for i in range(len(checkpoints)-1, -1, -1):
-            comment = checkpoints[i].comment
-            if comment == '':
-                comment = ". . ."
-            checkpointList.append(str(checkpoints[i].relative_path))
-            checkpointList.append(comment)
-            checkpointList.append(self.user)
-            checkpointList.append(str(checkpoints[i].modified_time))
-        
-        return checkpointList
 
     def create_folder(self, path):
         omni.client.create_folder(path)

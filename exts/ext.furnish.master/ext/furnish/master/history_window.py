@@ -179,6 +179,11 @@ class HistoryUI():
                 ui.Spacer(height=5)
                 with ui.HStack(height=40):
                     ui.Label(self.user, name="TITLE")
+                    ui.Button(
+                        style = Icon.SAVE_STYLE, width=30, height=30, name='user', tooltip='Logout', 
+                        alignment=ui.Alignment.RIGHT,
+                        image_url = Icon.User
+                    )
                 with ui.HStack(height=40):
                     ui.Label(layer[-1], height=25, width=100, name="SUBTITLE")
                     ui.Button(
