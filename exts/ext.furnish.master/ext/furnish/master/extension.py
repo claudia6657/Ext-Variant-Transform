@@ -39,9 +39,10 @@ class ExtFurnishMasterExtension(omni.ext.IExt):
         if set_layer or self._layer.tempLayer:
             self._hisui._user_window.visible = False
             self._hisui.build_history()
-            self._ui.tool.Get_Area_Camera()
-            self._ui.tool.Get_Floor_Camera()
-            self._ui.build_controller()
+            area = self._ui.tool.Get_Area_Camera()
+            floor = self._ui.tool.Get_Floor_Camera()
+            if area and floor:
+                self._ui.build_controller()
         else:
             self._hisui._user_window.visible = False
             def add_new_user():

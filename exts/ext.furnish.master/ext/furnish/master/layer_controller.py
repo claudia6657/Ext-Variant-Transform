@@ -171,7 +171,7 @@ class LayerController():
                 self.tempLayer = layer
             if position == 1:
                 target = layer
-        if target and self.tempLayer:
+        if self.tempLayer:
             omni.kit.commands.execute("SetEditTarget", layer_identifier=self.tempLayer)
         
     def transfer_Layer(self, path):

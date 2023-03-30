@@ -2,9 +2,9 @@ import omni.usd
 import omni.kit.commands
 from omni.kit.viewport.utility import get_active_viewport
 
-AreaCameraScope = '/World/ExtCamera/AreaCamera'
-FloorCameraScope = '/World/ExtCamera/FloorCamera'
-UserCamera = '/World/ExtCamera/User' 
+AreaCameraScope = '/World/Ext_Camera/Area'
+FloorCameraScope = '/World/Ext_Camera/Floor'
+UserCamera = '/World/Ext_Camera/User' 
 
 class ExtensionTool():
     
@@ -47,6 +47,7 @@ class ExtensionTool():
         for i in basePrim.GetChildren():
             self.controller.Area.append(i.GetName())
         
+        print(self.controller.Area)
         return True
 
     def Get_Floor_Camera(self):
